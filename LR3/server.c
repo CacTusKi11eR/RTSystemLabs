@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
-//#include <sys/neutrino.h>
+#include <sys/neutrino.h>
 
 int is_not_consonant(char c)
 {
