@@ -5,18 +5,21 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <string.h>
-#include <sys/neutrino.h>
+#include <stdlib.h>
+//#include <sys/neutrino.h>
 
-int is_consonant(char c)
+int is_not_consonant(char c)
 {
-    c = tolover(c);
-    if (!isalpha(c)) return 0;
-    return c != 'a' && c != 'e' && c != 'i' && c != 'o' && c != 'u' && c != 'y';
+    c = tolower(c);
+    if (!isalpha(c)) return 1;
+    return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' || c == 'y';
 }
-void filter_consonants(const char *input, char *output) {
+
+// Переименовали функцию
+void filter_non_consonants(const char *input, char *output) {
     int j = 0;
     for (int i = 0; input[i] != '\0'; i++) {
-        if (is_consonant(input[i])) {
+        if (is_not_consonant(input[i])) {
             output[j++] = input[i];
         }
     }
@@ -28,11 +31,15 @@ void server(void)
     int rcvid;
     int chid;
     char message[512];
-    char consonants[512];
+    char non_consonants[512];
 
     printf("Server start working \n");
 
     chid = ChannelCreate(0);
+    if (chid == -1) {
+        perror("ChannelCreate failed");
+        exit(1);
+    }
     printf("Channel id: %d \n", chid);
     printf("Pid: %d \n", getpid());
 
@@ -46,10 +53,10 @@ void server(void)
         }
         printf("Poluchili soobshenie, rcvid: %X \n", rcvid);
         printf("Soobshenie takoe: \"%s\". \n", message);
-        filter_consonants(message, consonants);
-        printf("Soglasnie: \"%s\". \n", consonants);
+        filter_non_consonants(message, non_consonants);
+        printf("Ne soglasnie: \"%s\". \n", non_consonants);
 
-        if(MsgReply(rcvid, EOK, consonants, strlen(consonants)+1) == -1){
+        if(MsgReply(rcvid, EOK, non_consonants, strlen(non_consonants)+1) == -1){
             perror("MsgReply error");
         }
     }
@@ -61,5 +68,5 @@ int main(void)
     printf("Prog server \n");
     server();
     sleep(5);
-    return(1);
+    return(EXIT_SUCCESS);
 }

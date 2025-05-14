@@ -3,7 +3,8 @@
 #include <inttypes.h>
 #include <errno.h>
 #include <unistd.h>
-#include <sys/neutrino.h>
+#include <string.h>
+//#include <sys/neutrino.h>
 
 int main(void)
 {
@@ -15,7 +16,11 @@ int main(void)
     scanf("%ld", &serv_pid);
     printf("Vveli %ld \n", serv_pid);
     coid = ConnectAttach(0, serv_pid, 1, 0, 0);
-    printf("ConMsgReply(rcvid, EOK, consonants, strlen(consonants));nect res %d \nVvedite soobshenie \n", smsg);
+    if (coid == -1) {
+        perror("ConnectAttach failed");
+        return 1;
+    }
+    printf("ConnectAttach result %d\nVvedite soobshenie \n", coid);
     getchar();
     fgets(smsg, sizeof(smsg), stdin);
     size_t len = strlen(smsg);
@@ -30,6 +35,7 @@ int main(void)
         ConnectDetach(coid);
         return(-1);
     }
+    printf("Otvet servera: %s\n", rmsg);
     ConnectDetach(coid);
     return(1);
 }
